@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор паролів</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      color: white;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      position: relative;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkle 2s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+
+    .animal {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      z-index: 1;
+      will-change: transform;
+    }
+
+    .dog {
+      background-image: url('https://cdn-icons-png.flaticon.com/512/616/616408.png');
+      animation: float 15s linear infinite;
+    }
+
+    .cat {
+      background-image: url('https://cdn-icons-png.flaticon.com/512/616/616430.png');
+      animation: float 18s linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(-100px, calc(100vh + 50px)) rotate(0deg);
+      }
+      100% {
+        transform: translate(calc(100vw + 100px), -100px) rotate(360deg);
+      }
+    }
+
+    .planet {
+      position: absolute;
+      border-radius: 50%;
+      background-size: cover;
+      background-repeat: no-repeat;
+      box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.5);
+      z-index: 0;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .planet:hover {
+      transform: scale(1.05);
+    }
+
+    .planet1 {
+      width: 80px;
+      height: 80px;
+      top: 5%;
+      left: 15%;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/640px-FullMoon2010.jpg');
+    }
+
+    .planet2 {
+      width: 120px;
+      height: 120px;
+      top: 50%;
+      left: 70%;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/640px-OSIRIS_Mars_true_color.jpg');
+    }
+
+    .container {
+      position: relative;
+      top: 30vh;
+      z-index: 2;
+      padding: 0 15px;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      background: #00ffcc;
+      color: black;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #00cc99;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 20px;
+      color: #00ffcc;
+      word-break: break-all;
+      padding: 0 10px;
+    }
+
+    .length-input {
+      margin-top: 15px;
+      font-size: 16px;
+    }
+
+    .length-input input {
+      width: 50px;
+      font-size: 16px;
+      padding: 5px;
+      margin-left: 8px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    .error-message {
+      color: #ff5555;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .joke-notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: #00ffcc;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #00ffcc;
+      max-width: 80%;
+      text-align: center;
+      z-index: 1000;
+      display: none;
+      animation: fadeIn 0.5s;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .close-joke {
+      margin-top: 15px;
+      padding: 8px 15px;
+      background: #00ffcc;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .close-joke:hover {
+      background: #00cc99;
+    }
+
+    @media (max-width: 600px) {
+      .animal {
+        width: 30px;
+        height: 30px;
+      }
+
+      .planet1 {
+        width: 60px;
+        height: 60px;
+      }
+
+      .planet2 {
+        width: 90px;
+        height: 90px;
+      }
+
+      .container {
+        top: 25vh;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+
+      #result {
+        font-size: 18px;
+      }
+      
+      .joke-notification {
+        padding: 15px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .length-input {
+        font-size: 14px;
+      }
+
+      .length-input input {
+        width: 40px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Зірки -->
+  <script>
+    const starCount = window.innerWidth < 600 ? 50 : 100;
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.top = Math.random() * 100 + 'vh';
+      star.style.left = Math.random() * 100 + 'vw';
+      star.style.animationDelay = (Math.random() * 2) + 's';
+      document.body.appendChild(star);
+    }
+  </script>
+
+  <!-- Планети -->
+  <div class="planet planet1" id="moon"></div>
+  <div class="planet planet2"></div>
+
+  <!-- Тварини -->
+  <div class="animal dog" style="top: 20%; left: -50px;"></div>
+  <div class="animal dog" style="top: 30%; left: -60px; animation-duration: 17s;"></div>
+  <div class="animal cat" style="top: 70%; left: -50px;"></div>
+  <div class="animal cat" style="top: 40%; left: -60px; animation-duration: 20s;"></div>
+
+  <!-- Контейнер з генератором -->
+  <div class="container">
+    <button class="btn" onclick="generatePassword()">Згенерувати пароль</button>
+    <div class="length-input">
+      Довжина: <input type="number" id="length" value="12" min="4" max="64">
+    </div>
+    <div id="result"></div>
+    <div id="error" class="error-message"></div>
+  </div>
+
+  <!-- Сплывающее окно с анекдотом -->
+  <div id="jokeNotification" class="joke-notification">
+    <p>На мотоциклі каляска була погано прикріплена, тому Сашко та Ольга розійшлися красиво</p>
+    <button class="close-joke" onclick="closeJoke()">Закрити</button>
+  </div>
+
+  <script>
+    // Генерация пароля
+    function generatePassword() {
+      const lengthInput = document.getElementById("length");
+      const errorElement = document.getElementById("error");
+      let length = parseInt(lengthInput.value);
+      
+      errorElement.textContent = "";
+      
+      if (isNaN(length)) {
+        errorElement.textContent = "Будь ласка, введіть число!";
+        return;
+      }
+      
+      if (length < 4) {
+        errorElement.textContent = "Мінімум: 4 символи!";
+        length = 4;
+      } else if (length > 64) {
+        errorElement.textContent = "Максимум: 64 символи!";
+        length = 64;
+      }
+      
+      lengthInput.value = length;
+      
+      const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+      let password = "";
+      for (let i = 0; i < length; ++i) {
+        password += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+      document.getElementById("result").textContent = password;
+    }
+
+    // Анекдот при клике на луну
+    document.getElementById('moon').addEventListener('click', function() {
+      document.getElementById('jokeNotification').style.display = 'block';
+    });
+
+    // Закрытие анекдота
+    function closeJoke() {
+      document.getElementById('jokeNotification').style.display = 'none';
+    }
+
+    // Оптимизация для мобильных
+    document.addEventListener('DOMContentLoaded', () => {
+      const isMobile = window.innerWidth < 600;
+      const animals = document.querySelectorAll('.animal');
+      
+      animals.forEach(animal => {
+        const randomDelay = Math.random() * 5;
+        animal.style.animationDelay = `${randomDelay}s`;
+        if (isMobile) {
+          animal.style.animationDuration = `${15 + Math.random() * 10}s`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
